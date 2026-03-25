@@ -34,7 +34,11 @@ A patient records management app built with Node.js, Express, MySQL, and jQuery.
         npm install
 
 
-### 3. Create .env file
+### 3. Create your branch (IMPORTANT) (please create your branch and don't work on main branch)
+git checkout -b feature/your-feature-name 
+### example= git checkout -b  feature/login
+
+### 4. Create .env file
 Copy .env.example and rename it to .env
 Then fill in your own values:
 
@@ -44,10 +48,10 @@ DB_PASSWORD=your_mysql_password
 DB_NAME=patient_records
 PORT=5000
 
-### 4. Start the server
+### 5. Start the server
 node backend/server.js
 
-### 5. Open the app
+### 6. Open the app
 Go to http://localhost:5000 in your browser
 
 
