@@ -1,63 +1,63 @@
-# Patient-Records-App 🏥
+# 🏥 Trustworthy - Medical Patient Management
+### 📂 Branch: `feature/database-and-models`
+**Owner:** Sougata Nandy 
+This branch contains the **Data Layer** for the Trustworthy application. I have initialized the MySQL connection using **Sequelize ORM** and defined the core models for Users and Patients.
 
-A patient records management app built with Node.js, Express, MySQL, and jQuery.
+---
 
-> ⚠️ Version 1 — Deliberately insecure for learning purposes!
+## 🛠️ Database Setup (For Team Members)
+Before you start working on your controllers, please sync your local database:
 
-## Team Members
-- Rakshitha
-- Rahul
-- Yashas
-- Vineeth
-- Ranjith
-- Sougath
-- Vivek
+1. **Import Schema:** Open your MySQL terminal/Workbench and run the script found in `/database/schema.sql`.
+2. **Update Environment Variables:** 
+3. **Install Dependencies:** Run `npm install` to ensure you have `sequelize`, `mysql2`, and `dotenv`.
 
-## Tech Stack
-- Frontend: HTML, CSS, JavaScript, jQuery, AJAX
-- Backend: Node.js, Express.js
-- Database: MySQL
+---
 
-## Steps to run this project-
+## 🏗️ Architecture & Models
+I have implemented the **MVC (Model-View-Controller)** pattern. You can now interact with the database using JavaScript objects instead of raw SQL.
 
-### 1. Clone the repository
+### 1. User Model (`backend/models/userModel.js`)
+Handles medical staff registration and authentication.
+* **Fields:** `firstName`, `lastName`, `email`, `password`, `otp`, `otpExpires`.
 
-    Go to a folder where you want the project
-        cd Desktop
-    Clone the repository
-        git clone https://github.com/Rakshitha-YK/Patient-Records-App.git
-
-### 2. Install dependencies
-    Go inside the project 
-        cd Patient-Records-App
-    Install dependencies
-        npm install
+### 2. Patient Model (`backend/models/patientModel.js`)
+Handles the clinical records added by doctors.
+* **Fields:** `legalName`, `dob`, `gender`, `contact`, `bloodGroup`, `medicalHistory`, etc.
+* **Relationship:** **One-to-Many**. One User can own many Patient records.
+* **Security:** `ON DELETE CASCADE` is active. If a User account is deleted, all their patients are automatically wiped.
 
 
-### 3. Create your branch (IMPORTANT) (please create your branch and don't work on main branch)
-git checkout -b feature/your-feature-name 
-### example= git checkout -b  feature/login
 
-### 4. Create .env file
-Copy .env.example and rename it to .env
-Then fill in your own values:
+---
 
-DB_HOST=localhost
-DB_USER=your_mysql_username
-DB_PASSWORD=your_mysql_password
-DB_NAME=patient_records
-PORT=5000
+## 🚀 How to use in your Controllers
+To use these models in your assigned tasks (Auth/Patients), simply import them:
 
-### 5. Start the server
-node backend/server.js
+```javascript
+const User = require('../models/userModel');
+const Patient = require('../models/patientModel');
 
-### 6. Open the app
-Go to http://localhost:5000 in your browser
+// Example: Finding a user
+const user = await User.findOne({ where: { email: 'doctor@clinic.com' } });
 
+// Example: Creating a patient record linked to a doctor
+await Patient.create({
+    legalName: "Jane Doe",
+    userId: req.user.id // Use the logged-in user's ID
+});
+```
 
-## Project Structure
-- frontend/ — View layer (HTML, CSS, JS)
-- backend/models/ — Model layer (database queries)
-- backend/controllers/ — Controller layer (business logic)
-- backend/routes/ — Routes (URL mapping)
-- database/ — SQL schema
+---
+
+## 🏁 Progress Checklist
+- [x] MySQL Connection Setup (`db.js`)
+- [x] Sequelize User Model defined
+- [x] Sequelize Patient Model defined (with Foreign Key)
+- [x] Server-side DB Sync logic implemented
+- [x] Cascading Delete functionality verified
+
+---
+
+### 💡 Note to Reviewers
+Please ensure your local MySQL service is running before starting the server. If you modify the models, let me know so I can update the `schema.sql`.
