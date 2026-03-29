@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS Patients (
     dob DATE NOT NULL,
     gender ENUM('Male', 'Female', 'Other') NOT NULL,
     contact VARCHAR(20),
+    aadhaarNumber VARCHAR(12),  
     bloodGroup VARCHAR(5),
     reasonForVisit TEXT,
     medicalHistory TEXT,
@@ -34,5 +35,3 @@ CREATE TABLE IF NOT EXISTS Patients (
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (userId) REFERENCES Users(id) ON DELETE CASCADE
 );
-
-
