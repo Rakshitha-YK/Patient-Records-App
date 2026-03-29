@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS Patients (
     dob DATE NOT NULL,
     gender ENUM('Male', 'Female', 'Other') NOT NULL,
     contact VARCHAR(20),
-    aadhaarNumber VARCHAR(12),  
+    aadhaarNumber VARCHAR(12),
     bloodGroup VARCHAR(5),
     reasonForVisit TEXT,
     medicalHistory TEXT,
