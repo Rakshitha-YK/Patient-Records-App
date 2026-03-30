@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="View and manage patient records" />
+    <title>Patients — Patient Records</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+    <div class="page-container">
+
+        <!-- ===== HEADER (always visible) ===== -->
+        <div class="card">
+            <div class="header-bar">
+                <div class="header-user-info">
+                    <img id="userProfileImg" class="header-avatar" src="" alt="Profile" />
+                    <h1 class="welcome-text">Welcome, <span id="userName">User</span> 👋</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+                    <button class="btn btn-secondary btn-sm" id="logoutBtn">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== LIST VIEW ===== -->
+        <div id="listView">
+            <div class="card">
+                <div class="header-bar" style="margin-bottom:1rem;">
+                    <h2 class="section-title">Patient Records</h2>
+                    <a href="create-patient.html" class="btn btn-primary btn-sm">+ Add Patient</a>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="patientTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Legal Name</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>Contact</th>
+                                <th>Blood Group</th>
+                                <th>Aadhar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="empty-state" id="emptyState">
+                    <div class="icon">📋</div>
+                    <p>No patients registered yet.</p>
+                    <a href="create-patient.html" class="btn btn-primary btn-sm" style="margin-top:1rem;">Register First
+                        Patient</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DASHBOARD VIEW (hidden by default) ===== -->
+        <div id="dashboardView" class="view-hidden">
+
+            <!-- Back link -->
+            <span class="back-link" id="backToList">← Back to Patients</span>
+
+            <!-- Patient Summary Card -->
+            <div class="card">
+                <h2 class="section-title" id="patientName">Patient</h2>
+                <div class="summary-grid" id="summaryGrid"></div>
+            </div>
+
+            <!-- Medical History Card -->
+            <div class="card" id="medicalHistoryCard">
+                <h2 class="section-title">Medical Information</h2>
+                <div class="medical-info-grid" id="medicalInfoGrid"></div>
+            </div>
+
+            <!-- Report Photo -->
+            <div class="card" id="reportPhotoCard" style="display:none;">
+                <h2 class="section-title">Report / Document</h2>
+                <div class="report-preview-container" id="reportPreviewContainer"></div>
+            </div>
+
+            <!-- Actions -->
+            <div class="card">
+                <div class="actions-row">
+                    <button class="btn btn-primary btn-sm" id="addVisitBtn">+ Add Visit</button>
+                    <button class="btn btn-secondary btn-sm" id="editPatientBtn">✏️ Edit Patient</button>
+                    <button class="btn btn-danger btn-sm" id="deletePatientBtn">🗑️ Delete Patient</button>
+                </div>
+            </div>
+
+            <!-- Visit History -->
+            <div class="card">
+                <h2 class="section-title">Visit History</h2>
+                <div id="visitList"></div>
+                <div class="empty-state" id="emptyVisits">
+                    <div class="icon">🩺</div>
+                    <p>No visits recorded yet. Click "+ Add Visit" to create one.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ADD VISIT MODAL ===== -->
+    <div class="modal-overlay" id="visitModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="section-title">Add Visit</h2>
+                <button class="modal-close" id="closeVisitModal">✕</button>
+            </div>
+
+            <form id="visitForm" novalidate>
+                <p class="section-label">Visit Information</p>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="visitDate">Visit Date</label>
+                        <input type="date" id="visitDate" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="doctorName">Doctor Name</label>
+                        <input type="text" id="doctorName" placeholder="Dr. Name" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="symptoms">Symptoms</label>
+                    <input type="text" id="symptoms" placeholder="e.g. Fever, Headache" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="diagnosis">Diagnosis</label>
+                    <input type="text" id="diagnosis" placeholder="e.g. Viral Infection" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="visitNotes">Notes</label>
+                    <textarea id="visitNotes" rows="2" placeholder="Additional notes (optional)"></textarea>
+                </div>
+
+                <!-- Prescription -->
+                <p class="section-label">Prescription</p>
+                <div id="medicineRows" class="medicine-rows"></div>
+                <button type="button" class="btn btn-secondary btn-sm" id="addMedicineBtn">+ Add Medicine</button>
+
+                <button type="submit" class="btn btn-primary full-width" style="margin-top:1rem;">Save Visit</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== EDIT PATIENT MODAL ===== -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="section-title">Edit Patient</h2>
+                <button class="modal-close" id="closeEditModal">✕</button>
+            </div>
+
+            <form id="editForm" novalidate>
+                <p class="section-label">Basic Information</p>
+
+                <div class="form-group">
+                    <label for="editLegalName">Legal Name <span class="required-star">*</span></label>
+                    <input type="text" id="editLegalName" required />
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editGender">Gender <span class="required-star">*</span></label>
+                        <select id="editGender" required>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editDob">Date of Birth <span class="required-star">*</span></label>
+                        <input type="date" id="editDob" required />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editContact">Contact</label>
+                        <input type="tel" id="editContact" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editAadharCard">Aadhar Card</label>
+                        <input type="text" id="editAadharCard" maxlength="14" />
+                    </div>
+                </div>
+
+                <p class="section-label">Medical</p>
+
+                <div class="form-group">
+                    <label for="editBloodGroup">Blood Group</label>
+                    <select id="editBloodGroup">
+                        <option value="">Select</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A−</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B−</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB−</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O−</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="editReasonForVisit">Reason for Visit</label>
+                    <textarea id="editReasonForVisit" rows="2"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="editMedicalHistory">Medical History</label>
+                    <textarea id="editMedicalHistory" rows="2"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="editMedications">Medications</label>
+                    <textarea id="editMedications" rows="2"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="editSurgicalHistory">Surgical History</label>
+                    <textarea id="editSurgicalHistory" rows="2"></textarea>
+                </div>
+
+                <p class="section-label">Social History</p>
+                <div id="editSocialHistoryQuestions" class="social-history-questions">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Do you smoke?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="edit_sh_smoking" value="Yes"> Yes
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="edit_sh_smoking" value="No" checked> No
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Consume alcohol?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="edit_sh_alcohol" value="Yes"> Yes
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="edit_sh_alcohol" value="No" checked> No
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Use recreational drugs?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="edit_sh_drugs" value="Yes"> Yes
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="edit_sh_drugs" value="No" checked> No
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Exercise regularly?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="edit_sh_exercise" value="Yes"> Yes
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="edit_sh_exercise" value="No" checked> No
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Follow a special diet?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="edit_sh_diet" value="Yes"> Yes
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="edit_sh_diet" value="No" checked> No
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Consume caffeine regularly?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="edit_sh_caffeine" value="Yes"> Yes
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="edit_sh_caffeine" value="No" checked> No
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="section-label">Report</p>
+                <div class="form-group">
+                    <label for="editReportPhoto">Upload Report / Document</label>
+                    <input type="file" id="editReportPhoto" accept="image/*,.pdf" />
+                    <div class="file-preview" id="editFilePreview" style="display:none;margin-top:0.5rem;">
+                        <span class="file-name" id="editFileName"></span>
+                        <button type="button" class="btn btn-danger btn-icon" id="editRemoveFile"
+                            title="Remove">✕</button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary full-width">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="js/patients.js"></script>
+</body>
+
+</html>
