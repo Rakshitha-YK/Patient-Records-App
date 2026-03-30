@@ -4,6 +4,7 @@ node_modules/
 # Environment variables
 .env
 
+backend/uploads/
 # Logs
 *.log
 

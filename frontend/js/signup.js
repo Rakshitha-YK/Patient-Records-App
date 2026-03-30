@@ -3,7 +3,7 @@
 // Aligned with Users DB schema
 // ============================================
 
-const API_BASE = ''; // e.g. 'http://localhost:5000/api'
+const API_BASE = 'http://localhost:5000/api';
 
 $(document).ready(function () {
 

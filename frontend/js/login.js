@@ -4,7 +4,7 @@
 // ============================================
 
 // Base API URL — change this when backend is ready
-const API_BASE = ''; // e.g. 'http://localhost:5000/api'
+const API_BASE = 'http://localhost:5000/api'; // e.g. 'http://localhost:5000/api'
 
 $(document).ready(function () {
 
@@ -13,7 +13,8 @@ $(document).ready(function () {
         e.preventDefault();
 
         var email = $.trim($('#email').val());
-        var password = $('#password').val();
+        // var password = $('#password').val();
+        var password = $.trim($('#password').val());
 
         // Validation
         if (!email || !password) {

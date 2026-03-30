@@ -2,10 +2,11 @@
 // Create Patient — create-patient.js (jQuery + AJAX)
 // Aligned with Patients DB schema
 // ============================================
-
-const API_BASE = ''; // e.g. 'http://localhost:5000/api'
+console.log("CREATE PATIENT JS LOADED");
+const API_BASE = 'http://localhost:5000/api'; 
 
 $(document).ready(function () {
+     console.log("JS LOADED ✅");
 
     // Auth check
     var currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -50,6 +51,7 @@ $(document).ready(function () {
     // ---- Form Submit ----
     $('#registerForm').on('submit', function (e) {
         e.preventDefault();
+        
 
         var legalName = $.trim($('#legalName').val());
         var gender = $('#gender').val();
@@ -108,7 +110,7 @@ $(document).ready(function () {
             }
 
             $.ajax({
-                url: API_BASE + '/patients',
+                url: API_BASE + '/patients/create',
                 type: 'POST',
                 data: formData,
                 processData: false,
@@ -159,6 +161,8 @@ $(document).ready(function () {
                 window.location.href = 'patients.html';
             }, 600);
         }
+
+        console.log("FORM SUBMITTED ✅");
         // ==============================
     });
 });
