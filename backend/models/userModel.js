@@ -7,6 +7,7 @@ const User = sequelize.define('User', {
     email: { type: DataTypes.STRING, allowNull: false, unique: true },
     password: { type: DataTypes.STRING, allowNull: false },
     profilePhoto: { type: DataTypes.STRING },
+    aadhaarNumber: { type: DataTypes.STRING(12) },
     otp: { type: DataTypes.STRING },
     otpExpires: { type: DataTypes.DATE }
 });
