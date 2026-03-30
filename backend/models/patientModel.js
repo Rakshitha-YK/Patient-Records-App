@@ -7,6 +7,7 @@ const Patient = sequelize.define('Patient', {
     dob: { type: DataTypes.DATEONLY, allowNull: false },
     gender: { type: DataTypes.ENUM('Male', 'Female', 'Other'), allowNull: false },
     contact: { type: DataTypes.STRING },
+    aadhaarNumber: { type: DataTypes.STRING(12) },
     bloodGroup: { type: DataTypes.STRING },
     reasonForVisit: { type: DataTypes.TEXT },
     medicalHistory: { type: DataTypes.TEXT },
