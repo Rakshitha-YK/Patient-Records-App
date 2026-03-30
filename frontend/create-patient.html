@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Register a new patient in the Patient Records Management System" />
+    <title>Register Patient — Patient Records</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body class="centered">
+    <div class="auth-container" style="max-width:620px;">
+        <a href="patients.html" class="back-link">← Back to Patients</a>
+
+        <div class="card">
+            <h1 class="card-title">Register Patient</h1>
+            <p class="card-subtitle">Fill in the details to add a new patient</p>
+
+            <form id="registerForm" novalidate>
+
+                <!-- Basic Information -->
+                <p class="section-label">Basic Information</p>
+
+                <div class="form-group">
+                    <label for="legalName">Legal Name <span class="required-star">*</span></label>
+                    <input type="text" id="legalName" placeholder="e.g. Rajesh Kumar Sharma" required />
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="gender">Gender <span class="required-star">*</span></label>
+                        <select id="gender" required>
+                            <option value="">Select</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dob">Date of Birth <span class="required-star">*</span></label>
+                        <input type="date" id="dob" required />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="contact">Contact Number</label>
+                        <input type="tel" id="contact" placeholder="e.g. 9876543210" maxlength="20" />
+                    </div>
+                    <div class="form-group">
+                        <label for="aadharCard">Aadhar Card Number</label>
+                        <input type="text" id="aadharCard" placeholder="e.g. 1234 5678 9012" maxlength="14" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bloodGroup">Blood Group</label>
+                    <select id="bloodGroup">
+                        <option value="">Select</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A−</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B−</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB−</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O−</option>
+                    </select>
+                </div>
+
+                <!-- Visit Details -->
+                <p class="section-label">Visit Details</p>
+
+                <div class="form-group">
+                    <label for="reasonForVisit">Reason for Visit</label>
+                    <textarea id="reasonForVisit" rows="2" placeholder="e.g. Persistent headache for 3 days"></textarea>
+                </div>
+
+                <!-- Medical History -->
+                <p class="section-label">Medical History</p>
+
+                <div class="form-group">
+                    <label for="medicalHistory">Past Medical History</label>
+                    <textarea id="medicalHistory" rows="2" placeholder="e.g. Diabetes Type 2, Hypertension"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="medications">Current Medications</label>
+                    <textarea id="medications" rows="2" placeholder="e.g. Metformin 500mg, Amlodipine 5mg"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="surgicalHistory">Surgical History</label>
+                    <textarea id="surgicalHistory" rows="2" placeholder="e.g. Appendectomy (2018)"></textarea>
+                </div>
+
+                <p class="section-label" style="margin-top: 1.5rem;">Social History</p>
+                <div id="socialHistoryQuestions" class="social-history-questions">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Do you smoke?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="sh_smoking" value="Yes"> Yes
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="sh_smoking" value="No" checked> No
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Consume alcohol?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="sh_alcohol" value="Yes"> Yes
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="sh_alcohol" value="No" checked> No
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Use recreational drugs?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="sh_drugs" value="Yes"> Yes
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="sh_drugs" value="No" checked> No
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Exercise regularly?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="sh_exercise" value="Yes"> Yes
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="sh_exercise" value="No" checked> No
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Follow a special diet?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="sh_diet" value="Yes"> Yes
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="sh_diet" value="No" checked> No
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Consume caffeine regularly?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="sh_caffeine" value="Yes"> Yes
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="sh_caffeine" value="No" checked> No
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Report Upload -->
+                <p class="section-label">Report Upload</p>
+
+                <div class="form-group">
+                    <label for="reportPhoto">Upload Report / Document</label>
+                    <div class="file-upload-wrapper" id="fileUploadWrapper">
+                        <input type="file" id="reportPhoto" accept="image/*,.pdf" />
+                        <div class="file-upload-display" id="fileUploadDisplay">
+                            <span class="file-upload-icon">📄</span>
+                            <span class="file-upload-text">Click or drag to upload a report</span>
+                            <span class="file-upload-hint">Images or PDF — Max 5MB</span>
+                        </div>
+                    </div>
+                    <div class="file-preview" id="filePreview" style="display:none;">
+                        <span class="file-name" id="fileName"></span>
+                        <button type="button" class="btn btn-danger btn-icon" id="removeFile" title="Remove">✕</button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary full-width" id="registerBtn">Register Patient</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="js/create-patient.js"></script>
+</body>
+
+</html>
