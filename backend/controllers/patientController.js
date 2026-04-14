@@ -3,18 +3,40 @@ const User = require('../models/userModel');
 
 const patientController = {
 
-    // GET ALL PATIENTS
+    // 1. GET PATIENTS (Filtered by Role)
     getAllPatients: async (req, res) => {
         try {
+            const { id, role } = req.user; // From Auth Middleware
+            let whereClause = {};
+
+            // DATA ISOLATION LOGIC
+            if (role === 'receptionist') {
+                // I only see patients I added
+                whereClause = { createdBy: id };
+            } 
+            else if (role === 'doctor') {
+                // I only see patients assigned to me
+                whereClause = { assignedDoctorId: id };
+            } 
+            else if (role === 'super_admin') {
+                // Maibaap sees everything
+                whereClause = {}; 
+            }
+
             const patients = await Patient.findAll({
-                include: [{
-                    model: User,
-                    attributes: [
-                        'firstName', 
-                        'lastName', 
-                        'email'
-                    ]
-                }]
+                where: whereClause,
+                include: [
+                    {
+                        model: User,
+                        as: 'receptionist', // Uses the alias from your Model
+                        attributes: ['firstName', 'lastName', 'email']
+                    },
+                    {
+                        model: User,
+                        as: 'doctor', // Shows who the assigned doctor is
+                        attributes: ['firstName', 'lastName', 'email']
+                    }
+                ]
             });
 
             res.json({ 
@@ -32,187 +54,125 @@ const patientController = {
         }
     },
 
-    // GET SINGLE PATIENT BY ID
+    // 2. GET SINGLE PATIENT (With Security Check)
     getPatientById: async (req, res) => {
         try {
             const { id } = req.params;
+            const { id: userId, role } = req.user;
 
             const patient = await Patient.findOne({
                 where: { id },
-                include: [{
-                    model: User,
-                    attributes: [
-                        'firstName', 
-                        'lastName', 
-                        'email'
-                    ]
-                }]
+                include: [
+                    { model: User, as: 'receptionist', attributes: ['firstName', 'lastName'] },
+                    { model: User, as: 'doctor', attributes: ['firstName', 'lastName'] }
+                ]
             });
 
             if (!patient) {
-                return res.status(404).json({ 
-                    success: false, 
-                    message: 'Patient not found' 
-                });
+                return res.status(404).json({ success: false, message: 'Patient not found' });
             }
 
-            res.json({ 
-                success: true, 
-                patient: patient 
-            });
+            // SECURITY GATE: Prevent URL manipulation
+            // If I'm a doctor and this patient isn't assigned to me, block access
+            if (role === 'doctor' && patient.assignedDoctorId !== userId) {
+                return res.status(403).json({ success: false, message: 'Access Denied: Not your patient' });
+            }
+            // If I'm a receptionist and I didn't create this record, block access
+            if (role === 'receptionist' && patient.createdBy !== userId) {
+                return res.status(403).json({ success: false, message: 'Access Denied: You did not register this patient' });
+            }
+
+            res.json({ success: true, patient });
 
         } catch (error) {
-            res.status(500).json({ 
-                success: false, 
-                message: 'Could not fetch patient', 
-                error: error.message 
-            });
+            res.status(500).json({ success: false, message: 'Error fetching patient', error: error.message });
         }
     },
 
-    // CREATE NEW PATIENT
-   createPatient: async (req, res) => {
-    try {
-        console.log("BODY:", req.body);
-        console.log("FILE:", req.file);
-        console.log("USER:", req.user);
+    // 3. CREATE NEW PATIENT (Attaching the Creator)
+    createPatient: async (req, res) => {
+        try {
+            const {
+                legalName, dob, gender, contact, bloodGroup,
+                reasonForVisit, medicalHistory, medications,
+                surgicalHistory, socialHistory, assignedDoctorId
+            } = req.body;
 
-        const {
-            legalName,
-            dob,
-            gender,
-            contact,
-            bloodGroup,
-            reasonForVisit,
-            medicalHistory,
-            medications,
-            surgicalHistory,
-            socialHistory
-        } = req.body;
+            if (!legalName || !dob || !gender) {
+                return res.status(400).json({ success: false, message: 'Required fields missing' });
+            }
 
-        if (!legalName || !dob || !gender) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Legal name, date of birth and gender are required' 
+            const receptionistId = req.user.id; // The logged-in receptionist
+
+            const reportPhoto = req.file
+                ? 'http://localhost:5000/uploads/' + req.file.filename
+                : null;
+
+            const newPatient = await Patient.create({
+                legalName,
+                dob,
+                gender,
+                contact,
+                bloodGroup,
+                reasonForVisit,
+                medicalHistory,
+                medications,
+                surgicalHistory,
+                socialHistory,
+                reportPhoto,
+                createdBy: receptionistId, // LOGS THE RECEPTIONIST
+                assignedDoctorId: assignedDoctorId || null // OPTIONAL ASSIGNMENT
             });
+
+            res.status(201).json({ success: true, message: 'Record created', patient: newPatient });
+
+        } catch (error) {
+            res.status(500).json({ success: false, message: 'Create failed', error: error.message });
         }
+    },
 
-        // ✅ SAFE check
-        if (!req.user || !req.user.id) {
-            return res.status(401).json({
-                success: false,
-                message: 'Unauthorized - invalid token'
-            });
-        }
-
-        const userId = req.user.id;
-
-        const reportPhoto = req.file
-            ? 'http://localhost:5000/uploads/' + req.file.filename
-            : null;
-
-        const newPatient = await Patient.create({
-            userId,
-            legalName,
-            dob,
-            gender,
-            contact,
-            bloodGroup,
-            reasonForVisit,
-            medicalHistory,
-            medications,
-            surgicalHistory,
-            socialHistory,
-            reportPhoto
-        });
-
-        res.status(201).json({ 
-            success: true, 
-            message: 'Patient record created successfully',
-            patient: newPatient
-        });
-
-    } catch (error) {
-        console.error("CREATE ERROR:", error); // 🔥 IMPORTANT
-
-        res.status(500).json({ 
-            success: false, 
-            message: 'Could not create patient', 
-            error: error.message 
-        });
-    }
-},
-
-    //UPDATE PATIENT
-
+    // 4. UPDATE PATIENT
     updatePatient: async (req, res) => {
         try {
             const { id } = req.params;
-
-            const patient = await Patient.findOne({ 
-                where: { id } 
-            });
+            const patient = await Patient.findOne({ where: { id } });
 
             if (!patient) {
-                return res.status(404).json({ 
-                    success: false, 
-                    message: 'Patient not found' 
-                });
+                return res.status(404).json({ success: false, message: 'Patient not found' });
             }
 
+            // Optional: Add logic here so only the assigned doctor can update clinical notes
             await patient.update(req.body);
 
-            res.json({ 
-                success: true, 
-                message: 'Patient record updated successfully',
-                patient: patient
-            });
+            res.json({ success: true, message: 'Updated successfully', patient });
 
         } catch (error) {
-            res.status(500).json({ 
-                success: false, 
-                message: 'Could not update patient', 
-                error: error.message 
-            });
+            res.status(500).json({ success: false, message: 'Update failed', error: error.message });
         }
     },
 
-    //DELETE PATIENT
+    // 5. DELETE PATIENT
     deletePatient: async (req, res) => {
         try {
             const { id } = req.params;
-
-            const patient = await Patient.findOne({ 
-                where: { id } 
-            });
+            const patient = await Patient.findOne({ where: { id } });
 
             if (!patient) {
-                return res.status(404).json({ 
-                    success: false, 
-                    message: 'Patient not found' 
-                });
+                return res.status(404).json({ success: false, message: 'Patient not found' });
+            }
+
+            // Only Super Admin should usually be allowed to delete
+            if (req.user.role !== 'super_admin') {
+                return res.status(403).json({ success: false, message: 'Only Admins can delete records' });
             }
 
             await patient.destroy();
-
-            res.json({ 
-                success: true, 
-                message: 'Patient record deleted successfully'
-            });
+            res.json({ success: true, message: 'Deleted successfully' });
 
         } catch (error) {
-            res.status(500).json({ 
-                success: false, 
-                message: 'Could not delete patient', 
-                error: error.message 
-            });
+            res.status(500).json({ success: false, message: 'Delete failed', error: error.message });
         }
     }
-
 };
 
 module.exports = patientController;
-
-
-
-

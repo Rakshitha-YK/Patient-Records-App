@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Master Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="centered">
+    <div class="card" style="text-align:center;">
+        <h1 style="font-size: 3rem;">🙏</h1>
+        <h1>Hello Maibaap!</h1>
+        <p>You are now in the Master Control Room.</p>
+        <hr>
+        <button onclick="logout()" class="btn btn-secondary">Exit System</button>
+    </div>
+
+    <script>
+        // Simple security check: if no token, kick them out
+        if (!localStorage.getItem('token')) {
+            window.location.href = 'index.html';
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
