@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Health Portal | Trustworthy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --bg: #f9fafb;
+            --card: #ffffff;
+            --text-dark: #111827;
+            --text-light: #6b7280;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        
+        .portal-wrapper { width: 100%; max-width: 700px; padding: 2rem; }
+        
+        .header { text-align: center; margin-bottom: 2rem; }
+        .header h1 { font-size: 2rem; font-weight: 800; color: var(--text-dark); margin: 0; }
+        .header p { color: var(--text-light); margin-top: 0.5rem; }
+
+        .card { background: var(--card); border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); padding: 2.5rem; border: 1px solid #f3f4f6; }
+
+        /* Doctor Info Box */
+        .doctor-box { background: #eef2ff; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem; border: 1px solid #e0e7ff; }
+        .doc-icon { background: var(--primary); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        
+        .section-title { font-size: 0.75rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #f3f4f6; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+        .info-item label { display: block; font-size: 0.8rem; color: var(--text-light); margin-bottom: 4px; }
+        .info-item span { font-weight: 600; color: var(--text-dark); }
+
+        .logout-btn { display: block; width: 100%; text-align: center; margin-top: 1.5rem; color: var(--text-light); font-size: 0.9rem; text-decoration: none; cursor: pointer; }
+        .logout-btn:hover { color: #ef4444; }
+    </style>
+</head>
+<body>
+
+    <div class="portal-wrapper">
+        <div class="header">
+            <h1>Patient Portal</h1>
+            <p>Welcome back, <span id="pName">...</span></p>
+        </div>
+
+        <div class="card">
+            <div class="section-title">Your Assigned Medical Professional</div>
+            <div class="doctor-box">
+                <div class="doc-icon">👨‍⚕️</div>
+                <div>
+                    <div style="font-weight: 700; color: var(--primary); font-size: 1.1rem;">
+                        Dr. <span id="docName">...</span>
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-light);">
+                        <span id="docSpecialty">...</span> | ID: <span id="docId">...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">Personal Records</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Unique ID</label>
+                    <span id="pId" style="color: var(--primary);">...</span>
+                </div>
+                <div class="info-item">
+                    <label>Blood Group</label>
+                    <span id="pBlood">...</span>
+                </div>
+                <div class="info-item">
+                    <label>Gender</label>
+                    <span id="pGender">...</span>
+                </div>
+                <div class="info-item">
+                    <label>Date of Birth</label>
+                    <span id="pDob">...</span>
+                </div>
+            </div>
+
+            <div class="section-title">Medical Summary</div>
+            <div style="background: #f9fafb; padding: 1rem; border-radius: 10px; font-size: 0.95rem; line-height: 1.6;">
+                <p id="pHistory">Loading your clinical history...</p>
+            </div>
+
+            <a class="logout-btn" id="logoutBtn">Logout of Secure Portal</a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="js/patient_portal.js"></script>
+</body>
+</html>

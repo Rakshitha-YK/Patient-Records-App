@@ -1,39 +1,64 @@
-Yo, listen up team! 
+## **1. Implementation Summary (This Week)**
+
+This week, the platform was developed from a static login page into a fully functional, role-based healthcare management system.
+
+* **Universal Auth Gate**: Implemented a single entry point for all users (Admin, Doctor, Receptionist, Patient) using system-generated unique IDs and JWT tokens for session security.
+* **Administrative Onboarding**: Removed public registration to ensure only verified staff can access the system; Admins create staff, and staff create patients.
+* **Personnel Management**: Built the Admin logic to register Doctors and Receptionists, including automated credential generation.
+* **Receptionist & Privacy Wall**: Created a patient onboarding flow where Receptionists register patients and assign doctors. A "Privacy Lock" ensures Receptionists only see contact info—medical data is strictly hidden.
+* **Doctor’s Clinical Dashboard**: Designed a high-impact "Medical Card" grid where doctors have full clinical access to the medical histories of their assigned patients.
+* **Patient Portal**: Finalized a secure view for patients to log in with their generated **PAT ID** to see their personal records and assigned doctor's details.
+* **Backend RBAC**: Secured all endpoints using Role-Based Access Control (RBAC) and Sequelize logic to prevent unauthorized data access.
+
 ---
 
-### 🚀 How to Run (Don't mess this up)
+## **2. How to Run the Project**
 
-1.  **Clone it:** You know the drill.
-2.  **Get into the backend:** `cd backend`. If you try to run it from the root, it’s going to scream at you with a "Module Not Found" error. Don't say I didn't warn you.
-3.  **Install the internet:** Run `npm install`. If **axios** acts like a brat, run `npm install axios` manually.
-4.  **The `.env` struggle:** Create a .env file in the backend folder. Add your MySQL credentials and a JWT_SECRET that’s actually hard to guess (not "123456").
-5.  **SQL Magic:** Just start the server with `node server.js`. Sequelize is set to `alter: true`, so it'll fix the database tables for you automatically.
+### **Step 1: Database Setup**
+1.  Open your MySQL terminal or Workbench.
+2.  Create the database: `CREATE DATABASE healthcare_db;`.
+3.  The system uses Sequelize `alter: true`, so all tables will be generated automatically on the first launch.
 
----
-
-### 🔑 The "God Mode" (Super Admin) Entrance
-
-We don't let just anyone be an Admin. It's a secret club.
-* **Step 1:** You can't sign up as Admin. You have to "hack" yourself in via MySQL Workbench. Run this:
-    ```sql
-    INSERT INTO Users (firstName, lastName, email, password, role, createdAt, updatedAt) 
-    VALUES ('System', 'Admin', 'admin@trustworthy.com', 'admin123', 'super_admin', NOW(), NOW());
+### **Step 2: Backend Configuration**
+1.  Navigate to the `/backend` folder.
+2.  Create a file named **`.env`** and add your credentials:
+    ```env
+    PORT=5000
+    DB_NAME=healthcare_db
+    DB_USER=your_username
+    DB_PASS=your_password
+    DB_HOST=localhost
+    JWT_SECRET=trust_no_one_123
     ```
-* **Step 2:** Go to the login page and hit **'A' + 'L'** at the same time. The page will transform like a Transformer. Use the email/pass from Step 1 to get in.
 
----
+### **Step 3: Installation & Launch**
+1.  Open your terminal in the `/backend` folder.
+2.  Install dependencies: `npm install`.
+3.  Start the server: `node server.js`.
+4.  Wait for the message: `📂 Models Synced with MySQL`.
 
-### 🩺 Doctor Registration (The "No Fakes" Zone)
 
-Doctors have to prove they actually went to med school.
-* **NMC ID Check:** On the signup page, a doctor MUST enter their **NMC ID** first.
-* **Real-time Roast:** Our app calls a separate "National Registry" API I built. If the ID isn't in my mock list, they get kicked out.
-* **Try these:** Use `NMC12345` or `NMC67890`. If the ID is legit, the app will auto-fill their name like magic. Then they can set a password.
+### **5. Manual SQL Command for Super Admin**
 
----
+Open your MySQL terminal or Workbench, ensure you are using the correct database, and run this command:
 
-### 🛡️ Cool Stuff I Added (Why Our App is Smarter Than Your Ex)
+```sql
+INSERT INTO Users (firstName, lastName, email, role, uniqueId, password, createdAt, updatedAt)
+VALUES (
+    'Main', 
+    'Admin', 
+    'admin@trustworthy.com', 
+    'super_admin', 
+    'ADM101', 
+    'admin123', 
+    NOW(), 
+    NOW()
+);
+```
 
-* **Portal Isolation:** Admins and Staff live in two different worlds. If an Admin tries to use the front door, the app says "Not today, honey."
-* **HIPAA & OWASP Vibes:** We’re keeping patient data locked down tighter than a vault. No hackers allowed in this house.
-* **Data Jealousy:** Receptionists only see the patients *they* brought to the party. Doctors only see the patients assigned to *them*. No peeking at each other's homework!
+
+### **Step 4: Accessing the App**
+1.  Go to the `/frontend` folder.
+2.  Open **`index.html`** using a local server (like VS Code **Live Server**).
+3.  Log in as a Super Admin to start adding staff and patients.
+
