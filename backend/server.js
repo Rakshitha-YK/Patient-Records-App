@@ -8,6 +8,7 @@ const Patient = require('./models/patientModel');
 const authRoutes = require('./routes/authRoutes');
 const patientRoutes = require('./routes/patientRoutes');
 const registryController = require('./controllers/registryController');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express(); // Define app BEFORE using it
 
@@ -19,10 +20,16 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/patients', patientRoutes);
+app.use('/api/users', userRoutes);
+
 
 // --- Your External API Mock Endpoint ---
 app.get('/api/external/nmc-check/:id', registryController.verifyDoctor);
 
+
+
+// Patient.belongsTo(User, { as: 'doctor', foreignKey: 'assignedDoctorId' });
+// User.hasMany(Patient, { foreignKey: 'assignedDoctorId' });
 // Sync Database
 connectDB();
 sequelize.sync({ alter: true })
