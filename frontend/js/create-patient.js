@@ -1,173 +1,91 @@
-// ============================================
-// Create Patient — create-patient.js (jQuery + AJAX)
-// Aligned with Patients DB schema
-// ============================================
-console.log("CREATE PATIENT JS LOADED");
 const API_BASE = 'http://localhost:5000/api'; 
 
 $(document).ready(function () {
-     console.log("JS LOADED ✅");
-
-    // Auth check
+    // 1. Auth check
     var currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) { window.location.href = 'index.html'; return; }
 
-    var selectedFileData = null;
+    // 2. Fetch Doctors for the dropdown menu
+    $.ajax({
+        url: API_BASE + '/users/doctors',
+        type: 'GET',
+        headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
+        success: function(res) {
+            let options = '<option value="">Select Assigned Doctor</option>';
+            res.doctors.forEach(doc => {
+                options += `<option value="${doc.id}">Dr. ${doc.firstName} ${doc.lastName} (${doc.specialist})</option>`;
+            });
+            $('#assignedDoctorId').html(options);
+        },
+        error: function() { showToast('Could not load doctor list.', 'error'); }
+    });
 
-    // ---- Aadhar card formatting (auto-space every 4 digits) ----
+    // 3. Aadhar formatting
     $('#aadharCard').on('input', function () {
         var val = $(this).val().replace(/\D/g, '').slice(0, 12);
         $(this).val(val.replace(/(\d{4})(?=\d)/g, '$1 '));
     });
 
-    // ---- File Upload handling ----
-    $('#reportPhoto').on('change', function () {
-        var file = this.files[0];
-        if (!file) return;
-
-        if (file.size > 5 * 1024 * 1024) {
-            showToast('File size must be under 5MB.', 'error');
-            $(this).val('');
-            return;
-        }
-
-        var reader = new FileReader();
-        reader.onload = function (e) {
-            selectedFileData = e.target.result;
-            $('#fileName').text(file.name);
-            $('#filePreview').css('display', 'flex');
-            $('#fileUploadDisplay').hide();
-        };
-        reader.readAsDataURL(file);
-    });
-
-    $('#removeFile').on('click', function () {
-        selectedFileData = null;
-        $('#reportPhoto').val('');
-        $('#filePreview').hide();
-        $('#fileUploadDisplay').css('display', 'flex');
-    });
-
-    // ---- Form Submit ----
+    // 4. Form Submit
     $('#registerForm').on('submit', function (e) {
         e.preventDefault();
         
+        const legalName = $.trim($('#legalName').val());
+        const gender = $('#gender').val();
+        const dob = $('#dob').val();
+        const assignedDoctorId = $('#assignedDoctorId').val();
 
-        var legalName = $.trim($('#legalName').val());
-        var gender = $('#gender').val();
-        var dob = $('#dob').val();
-        var contact = $.trim($('#contact').val());
-        var aadharCard = $('#aadharCard').val().replace(/\s/g, '');
-        var bloodGroup = $('#bloodGroup').val();
-        var reasonForVisit = $.trim($('#reasonForVisit').val());
-        var medicalHistory = $.trim($('#medicalHistory').val());
-        var medications = $.trim($('#medications').val());
-        var surgicalHistory = $.trim($('#surgicalHistory').val());
-        
-        // Collect social history from radio buttons
-        var shSmoking = $('input[name="sh_smoking"]:checked').val() || 'No';
-        var shAlcohol = $('input[name="sh_alcohol"]:checked').val() || 'No';
-        var shDrugs = $('input[name="sh_drugs"]:checked').val() || 'No';
-        var shExercise = $('input[name="sh_exercise"]:checked').val() || 'No';
-        var shDiet = $('input[name="sh_diet"]:checked').val() || 'No';
-        var shCaffeine = $('input[name="sh_caffeine"]:checked').val() || 'No';
-        var socialHistory = `Smoking: ${shSmoking}, Alcohol: ${shAlcohol}, Drugs: ${shDrugs}, Exercise: ${shExercise}, Diet: ${shDiet}, Caffeine: ${shCaffeine}`;
-
-        // Validation — required fields per DB: legalName, dob, gender
-        if (!legalName || !gender || !dob) {
-            showToast('Please fill in all required fields (Name, Gender, DOB).', 'error');
+        if (!legalName || !gender || !dob || !assignedDoctorId) {
+            showToast('Please fill all required fields and assign a doctor.', 'error');
             return;
         }
 
-        // Aadhar validation (if provided, must be 12 digits)
-        if (aadharCard && aadharCard.length !== 12) {
-            showToast('Aadhar card number must be 12 digits.', 'error');
-            return;
-        }
+        var formData = new FormData();
+        formData.append('legalName', legalName);
+        formData.append('dob', dob);
+        formData.append('gender', gender);
+        formData.append('contact', $.trim($('#contact').val()));
+        formData.append('assignedDoctorId', assignedDoctorId);
+        formData.append('bloodGroup', $('#bloodGroup').val());
+        formData.append('reasonForVisit', $.trim($('#reasonForVisit').val()));
+        formData.append('medicalHistory', $.trim($('#medicalHistory').val()));
+        formData.append('medications', $.trim($('#medications').val()));
+        formData.append('surgicalHistory', $.trim($('#surgicalHistory').val()));
 
-        // Disable button while processing
+        // Social History Logic
+        var socialHistory = `Smoking: ${$('input[name="sh_smoking"]:checked').val()}, Alcohol: ${$('input[name="sh_alcohol"]:checked').val()}`;
+        formData.append('socialHistory', socialHistory);
+
+        var fileInput = $('#reportPhoto')[0];
+        if (fileInput.files[0]) { formData.append('reportPhoto', fileInput.files[0]); }
+
         var $btn = $('#registerBtn');
-        $btn.prop('disabled', true).text('Registering…');
+        $btn.prop('disabled', true).text('Generating Credentials...');
 
-        // ======== AJAX-READY ========
-        if (API_BASE) {
-            var formData = new FormData();
-            formData.append('legalName', legalName);
-            formData.append('dob', dob);
-            formData.append('gender', gender);
-            formData.append('contact', contact);
-            formData.append('aadharCard', aadharCard);
-            formData.append('bloodGroup', bloodGroup);
-            formData.append('reasonForVisit', reasonForVisit);
-            formData.append('medicalHistory', medicalHistory);
-            formData.append('medications', medications);
-            formData.append('surgicalHistory', surgicalHistory);
-            formData.append('socialHistory', socialHistory);
-
-            var fileInput = $('#reportPhoto')[0];
-            if (fileInput.files[0]) {
-                formData.append('reportPhoto', fileInput.files[0]);
+        $.ajax({
+            url: API_BASE + '/patients/add', // Pointing to your new onboarding endpoint
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
+            success: function (res) {
+                // SUCCESS: Show the generated PAT ID and Password
+                $('#displayId').text(res.credentials.uniqueId);
+                $('#displayPass').text(res.credentials.password);
+                $('#credentialsDisplay').fadeIn();
+                
+                showToast('Patient Registered Successfully!', 'success');
+                $btn.text('Registration Complete');
+            },
+            error: function (xhr) {
+                showToast(xhr.responseJSON.message || 'Registration failed.', 'error');
+                $btn.prop('disabled', false).text('Register Patient');
             }
-
-            $.ajax({
-                url: API_BASE + '/patients/create',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                headers: {
-                    'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
-                },
-                success: function (response) {
-                    showToast('Patient registered successfully!', 'success');
-                    setTimeout(function () {
-                        window.location.href = 'patients.html';
-                    }, 600);
-                },
-                error: function (xhr) {
-                    var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Registration failed.';
-                    showToast(msg, 'error');
-                    $btn.prop('disabled', false).text('Register Patient');
-                }
-            });
-        } else {
-            // localStorage fallback
-            var patients = JSON.parse(localStorage.getItem('patients') || '[]');
-
-            patients.push({
-                id: Date.now().toString(),
-                userId: currentUser.id || currentUser.email,
-                legalName: legalName,
-                dob: dob,
-                gender: gender,
-                contact: contact || '',
-                bloodGroup: bloodGroup || '',
-                reasonForVisit: reasonForVisit || '',
-                medicalHistory: medicalHistory || '',
-                aadharCard: aadharCard || '',
-                medications: medications || '',
-                surgicalHistory: surgicalHistory || '',
-                socialHistory: socialHistory || '',
-                reportPhoto: selectedFileData || '',
-                visits: [],
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            });
-
-            localStorage.setItem('patients', JSON.stringify(patients));
-            showToast('Patient registered successfully!', 'success');
-
-            setTimeout(function () {
-                window.location.href = 'patients.html';
-            }, 600);
-        }
-
-        console.log("FORM SUBMITTED ✅");
-        // ==============================
+        });
     });
 });
 
-// ---- Toast Notification ----
 function showToast(msg, type) {
     $('.toast').remove();
     var $toast = $('<div>', { class: 'toast ' + type, text: msg });

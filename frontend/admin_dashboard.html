@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Trustworthy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f3f4f6;
+            --card: #ffffff;
+            --sidebar-bg: #111827;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --success-bg: #f0fdf4;
+            --success-border: #bbf7d0;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            color: white;
+            padding: 2.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar h2 { 
+            font-size: 1.5rem; 
+            margin: 0; 
+            letter-spacing: -0.025em; 
+            color: #fff;
+        }
+
+        /* --- Main Content Area --- */
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center; /* This centers horizontally */
+            align-items: center;     /* This centers vertically */
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* --- Centered Content Wrapper --- */
+        .content-container {
+            width: 100%;
+            max-width: 650px; /* Limits the width for a clean look */
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .header {
+            text-align: center; /* Centers text in the header */
+        }
+
+        .header h1 { 
+            font-size: 2.25rem; 
+            font-weight: 800; 
+            margin: 0; 
+            color: var(--sidebar-bg);
+        }
+        
+        .header p { 
+            color: var(--text-light); 
+            margin-top: 0.75rem; 
+            font-size: 1.1rem;
+        }
+
+        /* --- Modern Card Styling --- */
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 2rem;
+            font-size: 1.25rem;
+            text-align: center;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group { flex: 1; }
+        .form-group label { 
+            display: block; 
+            font-weight: 600; 
+            margin-bottom: 0.5rem; 
+            font-size: 0.85rem;
+            color: var(--text);
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 0.85rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            background-color: #f9fafb;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus { 
+            outline: none; 
+            border-color: var(--primary); 
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        /* The Specialist field - Hidden by default */
+        #specialistGroup { display: none; margin-top: 1.25rem; }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            margin-top: 1.5rem;
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(0); }
+
+        /* --- Credential Display (Centered & Clean) --- */
+        .credentials-box {
+            display: none;
+            margin-top: 2.5rem;
+            background: var(--success-bg);
+            border: 2px solid var(--success-border);
+            border-radius: 14px;
+            padding: 1.5rem;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .credentials-box h3 { 
+            color: #065f46; 
+            margin: 0 0 0.5rem 0; 
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .cred-item {
+            background: white;
+            padding: 1rem 1.25rem;
+            border-radius: 10px;
+            margin: 0.75rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #d1fae5;
+        }
+
+        .cred-label { font-size: 0.85rem; font-weight: 600; color: #6b7280; }
+        .cred-value { font-family: 'Courier New', monospace; font-size: 1.2rem; color: var(--danger); font-weight: 800; }
+
+        .alert-text {
+            font-size: 0.75rem;
+            color: #047857;
+            text-align: center;
+            display: block;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <h2>TRUSTWORTHY</h2>
+        <p style="font-size: 0.8rem; color: #9ca3af; margin-top: 5px;">Secure Health Systems</p>
+    </aside>
+
+    <main class="main-content">
+        <div class="content-container">
+            <header class="header">
+                <h1>Add New Staff</h1>
+                <p>Register professional medical personnel to the system.</p>
+            </header>
+
+            <div class="card">
+                <h2>Personnel Details</h2>
+                <form id="addStaffForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" id="firstName" placeholder="Jane" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name</label>
+                            <input type="text" id="lastName" placeholder="Smith" required />
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1.25rem;">
+                        <label>Official Email</label>
+                        <input type="email" id="staffEmail" placeholder="jane.smith@trustworthy.com" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Designated Role</label>
+                        <select id="staffRole">
+                            <option value="doctor">Medical Doctor</option>
+                            <option value="receptionist">Receptionist</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="specialistGroup">
+                        <label>Specialization</label>
+                        <input type="text" id="specialist" placeholder="e.g. Neurologist, General Surgeon">
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="submitBtn">Generate Access Credentials</button>
+                </form>
+
+                <div id="credentialsDisplay" class="credentials-box">
+                    <h3>✅ Account Provisioned</h3>
+                    <span class="alert-text">Record these details now. They are encrypted after viewing.</span>
+                    
+                    <div class="cred-item">
+                        <span class="cred-label">SYSTEM ID</span>
+                        <span class="cred-value" id="displayId"></span>
+                    </div>
+                    <div class="cred-item">
+                        <span class="cred-label">TEMPORARY PASSWORD</span>
+                        <span class="cred-value" id="displayPass"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

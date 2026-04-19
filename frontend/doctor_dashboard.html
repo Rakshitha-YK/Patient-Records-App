@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard | Trustworthy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --primary: #4f46e5;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --accent: #e0e7ff;
+            --border: #e5e7eb;
+            --danger: #ef4444;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: var(--text-main); }
+        
+        .page-header { background: #111827; color: white; padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .page-header h1 { margin: 0; font-size: 1.25rem; }
+
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+
+        /* Grid Layout for Patient Cards */
+        .patient-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); gap: 2rem; }
+
+        /* Patient Card Styling */
+        .patient-card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; }
+
+        .card-header { padding: 1.5rem; border-bottom: 1px solid var(--border); background: #f9fafb; display: flex; justify-content: space-between; align-items: center; }
+        .card-header h2 { margin: 0; font-size: 1.15rem; color: var(--primary); }
+        .patient-id { font-family: monospace; font-weight: 700; background: var(--accent); padding: 4px 8px; border-radius: 6px; font-size: 0.9rem; }
+
+        .card-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+        /* Information Sections */
+        .info-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; padding-bottom: 1rem; border-bottom: 1px dashed var(--border); }
+        .info-item label { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; }
+        .info-item span { font-weight: 600; font-size: 0.95rem; }
+
+        .medical-section { background: #f8fafc; padding: 1rem; border-radius: 10px; border-left: 4px solid var(--primary); }
+        .medical-section h3 { margin: 0 0 0.5rem 0; font-size: 0.85rem; text-transform: uppercase; color: var(--primary); }
+        .medical-section p { margin: 0; font-size: 0.9rem; line-height: 1.5; color: #334155; }
+
+        .blood-badge { color: white; background: var(--danger); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <header class="page-header">
+        <div>
+            <h1>Dr. <span id="doctorName">Loading...</span></h1>
+            <span id="specialistText" style="opacity: 0.7; font-size: 0.8rem;"></span>
+        </div>
+        <button id="logoutBtn" style="background: transparent; border: 1px solid white; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer;">Logout</button>
+    </header>
+
+    <div class="container">
+        <div class="patient-grid" id="patientGrid">
+            </div>
+
+        <div id="emptyState" style="display:none; text-align: center; margin-top: 5rem;">
+            <p style="color: var(--text-muted);">No patients currently assigned to your care.</p>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="js/doctor_dashboard.js"></script>
+</body>
+</html>

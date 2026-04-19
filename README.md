@@ -1,63 +1,64 @@
-# 🏥 Trustworthy - Medical Patient Management
-### 📂 Branch: `feature/database-and-models`
-**Owner:** Sougata Nandy 
-This branch contains the **Data Layer** for the Trustworthy application. I have initialized the MySQL connection using **Sequelize ORM** and defined the core models for Users and Patients.
+## **1. Implementation Summary (This Week)**
+
+This week, the platform was developed from a static login page into a fully functional, role-based healthcare management system.
+
+* **Universal Auth Gate**: Implemented a single entry point for all users (Admin, Doctor, Receptionist, Patient) using system-generated unique IDs and JWT tokens for session security.
+* **Administrative Onboarding**: Removed public registration to ensure only verified staff can access the system; Admins create staff, and staff create patients.
+* **Personnel Management**: Built the Admin logic to register Doctors and Receptionists, including automated credential generation.
+* **Receptionist & Privacy Wall**: Created a patient onboarding flow where Receptionists register patients and assign doctors. A "Privacy Lock" ensures Receptionists only see contact info—medical data is strictly hidden.
+* **Doctor’s Clinical Dashboard**: Designed a high-impact "Medical Card" grid where doctors have full clinical access to the medical histories of their assigned patients.
+* **Patient Portal**: Finalized a secure view for patients to log in with their generated **PAT ID** to see their personal records and assigned doctor's details.
+* **Backend RBAC**: Secured all endpoints using Role-Based Access Control (RBAC) and Sequelize logic to prevent unauthorized data access.
 
 ---
 
-## 🛠️ Database Setup (For Team Members)
-Before you start working on your controllers, please sync your local database:
+## **2. How to Run the Project**
 
-1. **Import Schema:** Open your MySQL terminal/Workbench and run the script found in `/database/schema.sql`.
-2. **Update Environment Variables:** 
-3. **Install Dependencies:** Run `npm install` to ensure you have `sequelize`, `mysql2`, and `dotenv`.
+### **Step 1: Database Setup**
+1.  Open your MySQL terminal or Workbench.
+2.  Create the database: `CREATE DATABASE healthcare_db;`.
+3.  The system uses Sequelize `alter: true`, so all tables will be generated automatically on the first launch.
 
----
+### **Step 2: Backend Configuration**
+1.  Navigate to the `/backend` folder.
+2.  Create a file named **`.env`** and add your credentials:
+    ```env
+    PORT=5000
+    DB_NAME=healthcare_db
+    DB_USER=your_username
+    DB_PASS=your_password
+    DB_HOST=localhost
+    JWT_SECRET=trust_no_one_123
+    ```
 
-## 🏗️ Architecture & Models
-I have implemented the **MVC (Model-View-Controller)** pattern. You can now interact with the database using JavaScript objects instead of raw SQL.
-
-### 1. User Model (`backend/models/userModel.js`)
-Handles medical staff registration and authentication.
-* **Fields:** `firstName`, `lastName`, `email`, `password`, `otp`, `otpExpires`.
-
-### 2. Patient Model (`backend/models/patientModel.js`)
-Handles the clinical records added by doctors.
-* **Fields:** `legalName`, `dob`, `gender`, `contact`, `bloodGroup`, `medicalHistory`, etc.
-* **Relationship:** **One-to-Many**. One User can own many Patient records.
-* **Security:** `ON DELETE CASCADE` is active. If a User account is deleted, all their patients are automatically wiped.
+### **Step 3: Installation & Launch**
+1.  Open your terminal in the `/backend` folder.
+2.  Install dependencies: `npm install`.
+3.  Start the server: `node server.js`.
+4.  Wait for the message: `📂 Models Synced with MySQL`.
 
 
+### **5. Manual SQL Command for Super Admin**
 
----
+Open your MySQL terminal or Workbench, ensure you are using the correct database, and run this command:
 
-## 🚀 How to use in your Controllers
-To use these models in your assigned tasks (Auth/Patients), simply import them:
-
-```javascript
-const User = require('../models/userModel');
-const Patient = require('../models/patientModel');
-
-// Example: Finding a user
-const user = await User.findOne({ where: { email: 'doctor@clinic.com' } });
-
-// Example: Creating a patient record linked to a doctor
-await Patient.create({
-    legalName: "Jane Doe",
-    userId: req.user.id // Use the logged-in user's ID
-});
+```sql
+INSERT INTO Users (firstName, lastName, email, role, uniqueId, password, createdAt, updatedAt)
+VALUES (
+    'Main', 
+    'Admin', 
+    'admin@trustworthy.com', 
+    'super_admin', 
+    'ADM101', 
+    'admin123', 
+    NOW(), 
+    NOW()
+);
 ```
 
----
 
-## 🏁 Progress Checklist
-- [x] MySQL Connection Setup (`db.js`)
-- [x] Sequelize User Model defined
-- [x] Sequelize Patient Model defined (with Foreign Key)
-- [x] Server-side DB Sync logic implemented
-- [x] Cascading Delete functionality verified
+### **Step 4: Accessing the App**
+1.  Go to the `/frontend` folder.
+2.  Open **`index.html`** using a local server (like VS Code **Live Server**).
+3.  Log in as a Super Admin to start adding staff and patients.
 
----
-
-### 💡 Note to Reviewers
-Please ensure your local MySQL service is running before starting the server. If you modify the models, let me know so I can update the `schema.sql`.

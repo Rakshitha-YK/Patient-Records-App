@@ -1,177 +1,60 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
+const Patient = require('../models/patientModel');
 
 const authController = {
-
-    // SIGNUP
-    signup: async (req, res) => {
-        try {
-            const { 
-                firstName, 
-                lastName, 
-                email, 
-                password 
-            } = req.body;
-
-            if (!firstName || !lastName || !email || !password) {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: 'All fields are required' 
-                });
-            }
-
-            const existingUser = await User.findOne({ 
-                where: { email } 
-            });
-
-            if (existingUser) {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: 'Email already registered' 
-                });
-            }
-
-            // Version 1 - plain text password
-            // Version 2 will hash with bcrypt
-            const newUser = await User.create({
-                firstName,
-                lastName,
-                email,
-                password,
-                profilePhoto: req.file 
-        ? 'http://localhost:5000/uploads/' + req.file.filename 
-        : 'default-profile.png'
-            });
-
-            // Generate token after signup
-            const token = jwt.sign(
-                { 
-                    id: newUser.id, 
-                    email: newUser.email,
-                    firstName: newUser.firstName,
-                    lastName: newUser.lastName
-                },
-                process.env.JWT_SECRET,
-                { expiresIn: '1h' }
-            );
-
-            res.status(201).json({ 
-                success: true, 
-                message: 'Account created successfully',
-                token: token,
-                user: {
-                    id: newUser.id,
-                    firstName: newUser.firstName,
-                    lastName: newUser.lastName,
-                    email: newUser.email
-                }
-            });
-
-        } catch (error) {
-            res.status(500).json({ 
-                success: false, 
-                message: 'Signup failed', 
-                error: error.message 
-            });
-        }
-    },
-
-    // LOGIN
     login: async (req, res) => {
         try {
-            const { email, password } = req.body;
+            const { uniqueId, password } = req.body;
 
-            if (!email || !password) {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: 'Email and password are required' 
-                });
+            if (!uniqueId || !password) {
+                return res.status(400).json({ success: false, message: 'ID and password required' });
             }
 
-            const user = await User.findOne({ 
-                where: { email } 
-            });
+            // 1. Search Users (Admin, Doctor, Receptionist)
+            let account = await User.findOne({ where: { uniqueId } });
+            let isStaff = true;
 
-            
-            console.log("Entered:", email, password);
-            console.log("DB:", user?.email, user?.password);
-
-            if (!user) {
-                return res.status(401).json({ 
-                    success: false, 
-                    message: 'Invalid email or password' 
-                });
+            // 2. Search Patients if not found in Users
+            if (!account) {
+                account = await Patient.findOne({ where: { uniqueId } });
+                isStaff = false;
             }
 
-            // Version 1 - plain text comparison  
-            if (password !== user.password) {
-                return res.status(401).json({ 
-                    success: false, 
-                    message: 'Invalid email or password' 
-                });
+            // 3. Credential Check
+            if (!account || password !== account.password) {
+                return res.status(401).json({ success: false, message: 'Invalid ID or password' });
             }
 
-            // Generate token after successful login
+            // 4. Generate Token (Includes role so frontend knows where to go)
             const token = jwt.sign(
                 { 
-                    id: user.id, 
-                    email: user.email,
-                    firstName: user.firstName,
-                    lastName: user.lastName
+                    id: account.id, 
+                    role: account.role, 
+                    name: isStaff ? account.firstName : account.legalName 
                 },
                 process.env.JWT_SECRET,
                 { expiresIn: '1h' }
             );
 
-            res.json({ 
-                success: true, 
-                message: 'Login successful',
+            res.json({
+                success: true,
                 token: token,
                 user: {
-                    id: user.id,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    email: user.email
+                    id: account.id,
+                    role: account.role,
+                    name: isStaff ? account.firstName : account.legalName
                 }
             });
 
         } catch (error) {
-            res.status(500).json({ 
-                success: false, 
-                message: 'Login failed', 
-                error: error.message 
-            });
+            res.status(500).json({ success: false, message: 'Login failed', error: error.message });
         }
     },
 
-    // LOGOUT
     logout: async (req, res) => {
-        try {
-            // Frontend will delete the token from localStorage
-            res.json({ 
-                success: true, 
-                message: 'Logged out successfully' 
-            });
-
-        } catch (error) {
-            res.status(500).json({ 
-                success: false, 
-                message: 'Logout failed', 
-                error: error.message 
-            });
-        }
+        res.json({ success: true, message: 'Logged out successfully' });
     }
-
 };
 
 module.exports = authController;
-
-
-
-
-
-
-
-
-
-

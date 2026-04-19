@@ -192,6 +192,28 @@
                     </div>
                 </div>
 
+                <p class="section-label">Assignment</p>
+                <div class="form-group">
+                    <label for="assignedDoctorId">Assign to Doctor <span class="required-star">*</span></label>
+                    <select id="assignedDoctorId" required>
+                        <option value="">Loading Doctors...</option>
+                    </select>
+                </div>
+
+                <div id="credentialsDisplay"
+                    style="display:none; margin-top:20px; padding:15px; background:#f0fdf4; border:2px solid #bbf7d0; border-radius:12px; text-align:center;">
+                    <h3 style="color:#166534; margin:0;">✅ Patient Registered</h3>
+                    <p style="font-size:0.85rem; color:#047857;">Provide these to the patient for their portal login:
+                    </p>
+                    <div
+                        style="background:white; padding:10px; border-radius:8px; margin-top:10px; border:1px solid #d1fae5;">
+                        <p style="margin:5px 0;"><strong>Patient ID:</strong> <span id="displayId"
+                                style="color:red; font-weight:800; font-family:monospace; font-size:1.2rem;"></span></p>
+                        <p style="margin:5px 0;"><strong>Password:</strong> <span id="displayPass"
+                                style="color:red; font-weight:800; font-family:monospace; font-size:1.2rem;"></span></p>
+                    </div>
+                </div>
+
                 <button type="submit" class="btn btn-primary full-width" id="registerBtn">Register Patient</button>
             </form>
         </div>
