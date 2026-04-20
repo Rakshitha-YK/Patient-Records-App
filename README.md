@@ -64,7 +64,7 @@ VALUES (
 
 
 
-#### **Audit logging & compliance**
+### **Audit logging & compliance**
 
 This week, the system was enhanced with a comprehensive audit logging and compliance tracking mechanism, transforming it into a security-aware healthcare platform.
 
