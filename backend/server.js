@@ -5,10 +5,13 @@ const express = require('express');
 const { connectDB, sequelize } = require('./db');
 const User = require('./models/userModel');
 const Patient = require('./models/patientModel');
+const AuditLog = require('./models/auditLogModel');
 const authRoutes = require('./routes/authRoutes');
 const patientRoutes = require('./routes/patientRoutes');
 const registryController = require('./controllers/registryController');
 const userRoutes = require('./routes/userRoutes');
+const auditRoutes = require('./routes/auditRoutes');
+const auditLogger = require('./middleware/auditLogger');
 
 const app = express(); // Define app BEFORE using it
 
@@ -16,11 +19,13 @@ const app = express(); // Define app BEFORE using it
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(auditLogger);
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/audit-logs', auditRoutes);
 
 
 // --- Your External API Mock Endpoint ---
