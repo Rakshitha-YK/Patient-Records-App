@@ -62,3 +62,15 @@ VALUES (
 2.  Open **`index.html`** using a local server (like VS Code **Live Server**).
 3.  Log in as a Super Admin to start adding staff and patients.
 
+
+This week, the system was enhanced with a comprehensive audit logging and compliance tracking mechanism, transforming it into a security-aware healthcare platform aligned with industry compliance standards.
+
+Centralized Audit Logging: Implemented a global middleware that automatically captures and records all /api/* requests, including user actions, request types, outcomes, and affected entities.
+Authentication Event Tracking: Added detailed logging for authentication flows, covering invalid payloads, failed login attempts, successful logins, and logout activities for complete traceability.
+PHI Access Identification: Introduced a PHI (Protected Health Information) flag to detect and mark any access to sensitive patient data, enabling compliance-focused monitoring and filtering.
+Request Data Sanitization: Secured audit logs by automatically redacting sensitive fields such as passwords, OTPs, and confidential inputs before storage.
+Retention Policy Enforcement: Integrated a retention mechanism where each audit log includes a predefined retention period (default: 7 years) to meet long-term compliance and regulatory requirements.
+Super Admin Audit Dashboard: Developed a dedicated audit dashboard for Super Admins featuring advanced filtering, summary insights, and detailed log inspection capabilities.
+Role-Based Access Control for Logs: Enforced strict RBAC policies ensuring only Super Admin users can access audit logs, preventing unauthorized visibility of sensitive system activities.
+Entity-Based Tracking: Structured logs to classify actions based on entity types such as Patient, User, Authentication, and System modules for better traceability and debugging.
+Outcome Classification: Standardized log outcomes into categories like SUCCESS, FAILURE, and DENIED based on HTTP responses for clear status interpretation.
