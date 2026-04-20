@@ -6,7 +6,7 @@ const User = sequelize.define('User', {
     lastName: { type: DataTypes.STRING, allowNull: false },
     email: { type: DataTypes.STRING, allowNull: false, unique: true },
     // --- NEW FIELD FOR SYSTEM LOGIN ---
-    uniqueId: { type: DataTypes.STRING, allowNull: false, unique: true },
+    uniqueId: { type: DataTypes.STRING, allowNull: true, unique: true },
     password: { type: DataTypes.STRING, allowNull: false },
     specialist: { type: DataTypes.STRING, allowNull: true },
     profilePhoto: { type: DataTypes.STRING },
