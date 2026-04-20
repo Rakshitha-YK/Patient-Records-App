@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const Patient = require('../models/patientModel');
+const { createAuditLog } = require('../utils/auditService');
 
 const authController = {
     login: async (req, res) => {
@@ -8,6 +9,16 @@ const authController = {
             const { uniqueId, password } = req.body;
 
             if (!uniqueId || !password) {
+                await createAuditLog({
+                    action: 'LOGIN_ATTEMPT_INVALID_PAYLOAD',
+                    accessType: 'LOGIN',
+                    outcome: 'FAILURE',
+                    entityType: 'Auth',
+                    ipAddress: req.ip,
+                    userAgent: req.get('user-agent'),
+                    details: { uniqueId: uniqueId || null }
+                });
+                res.locals.auditLogged = true;
                 return res.status(400).json({ success: false, message: 'ID and password required' });
             }
 
@@ -23,6 +34,20 @@ const authController = {
 
             // 3. Credential Check
             if (!account || password !== account.password) {
+                await createAuditLog({
+                    userId: account ? account.id : null,
+                    userRole: account ? account.role : null,
+                    action: 'USER_LOGIN_FAILURE',
+                    accessType: 'LOGIN',
+                    outcome: 'FAILURE',
+                    entityType: isStaff ? 'User' : 'Patient',
+                    entityId: account ? account.id : null,
+                    isPhiAccess: !isStaff,
+                    ipAddress: req.ip,
+                    userAgent: req.get('user-agent'),
+                    details: { uniqueId }
+                });
+                res.locals.auditLogged = true;
                 return res.status(401).json({ success: false, message: 'Invalid ID or password' });
             }
 
@@ -36,6 +61,23 @@ const authController = {
                 process.env.JWT_SECRET,
                 { expiresIn: '1h' }
             );
+
+            await createAuditLog({
+                userId: account.id,
+                userRole: account.role,
+                action: 'USER_LOGIN_SUCCESS',
+                accessType: 'LOGIN',
+                outcome: 'SUCCESS',
+                entityType: isStaff ? 'User' : 'Patient',
+                entityId: account.id,
+                isPhiAccess: !isStaff,
+                ipAddress: req.ip,
+                userAgent: req.get('user-agent'),
+                details: { uniqueId }
+            });
+            res.locals.auditLogged = true;
+            res.locals.auditUserId = account.id;
+            res.locals.auditUserRole = account.role;
 
             res.json({
                 success: true,
@@ -53,6 +95,15 @@ const authController = {
     },
 
     logout: async (req, res) => {
+        await createAuditLog({
+            action: 'USER_LOGOUT',
+            accessType: 'LOGOUT',
+            outcome: 'SUCCESS',
+            entityType: 'Auth',
+            ipAddress: req.ip,
+            userAgent: req.get('user-agent')
+        });
+        res.locals.auditLogged = true;
         res.json({ success: true, message: 'Logged out successfully' });
     }
 };
