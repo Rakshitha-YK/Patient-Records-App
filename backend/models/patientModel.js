@@ -8,7 +8,7 @@ const Patient = sequelize.define('Patient', {
     gender: { type: DataTypes.ENUM('Male', 'Female', 'Other'), allowNull: false },
     contact: { type: DataTypes.STRING },
     // --- NEW CREDENTIALS FOR PATIENT LOGIN ---
-    uniqueId: { type: DataTypes.STRING, allowNull: false, unique: true },
+    uniqueId: { type: DataTypes.STRING, allowNull: true, unique: true },
     password: { type: DataTypes.STRING, allowNull: false },
     role: { type: DataTypes.STRING, defaultValue: 'patient' },
     
